@@ -86,6 +86,8 @@ from rclpy.validate_parameter_name import validate_parameter_name
 from rclpy.validate_topic_name import validate_topic_name
 from rclpy.waitable import Waitable
 
+import os
+
 HIDDEN_NODE_PREFIX = '_'
 
 # Used for documentation purposes only
@@ -150,6 +152,16 @@ class Node:
         :param automatically_declare_parameters_from_overrides: If True, the "parameter overrides"
             will be used to implicitly declare parameters on the node during creation.
         """
+
+        print(f"RLCPY , {node_name} normal node starting with PID {os.getpid()}")
+        pid_dir = os.path.expanduser("~/ros2_pids")
+        os.makedirs(pid_dir, exist_ok=True)
+
+        pid_path = os.path.join(pid_dir, f"{node_name}.pid")
+
+        with open(pid_path, "w") as f:
+            f.write(str(os.getpid()))
+
         self.__handle = None
         self._context = get_default_context() if context is None else context
         self._parameters: dict = {}
@@ -419,6 +431,7 @@ class Node:
                 )
 
             value = None
+            param_type = None
 
             # Get the values from the tuple, checking its types.
             # Use defaults if the tuple doesn't contain value and / or descriptor.
